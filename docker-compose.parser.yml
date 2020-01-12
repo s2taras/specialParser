@@ -12,7 +12,5 @@ services:
     env_file: ./.env.parser
     tty: true
     environment:
-      PHP_EXTENSION_XDEBUG: 1
-      PHP_INI_XDEBUG__REMOTE_PORT: 9000
       PHP_IDE_CONFIG: "serverName=dockerParser"
       XDEBUG_CONFIG: "remote_port=9000 remote_autostart=1"
