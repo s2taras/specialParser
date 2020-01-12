@@ -1,4 +1,9 @@
 {
+  "autoload": {
+    "psr-4": {
+      "Parser\\": "src/"
+    }
+  },
   "require": {
     "phpquery/phpquery": "0.0.2"
   }

@@ -6,33 +6,13 @@ services:
     build:
       dockerfile: ./docker/php/parser/Dockerfile
       context: .
+      target: dev
     volumes:
       - ./parser:/var/www/parser
+    env_file: ./.env.parser
     tty: true
-
-
-
-
-
-
-#    php:
-#      container_name: sprinklebit-php
-#      image: sprinklebit-php
-#      build:
-#        dockerfile: docker/php/Dockerfile
-#        context: .
-#        args:
-#          SYMFONY_ENV: dev
-#          REDIS_HOST: 192.168.88.189
-#        target: dev
-#      env_file: ./.env.docker
-#      volumes:
-#        - ./src:/var/www/sprinklebit/src
-#        - ./app:/var/www/sprinklebit/app
-#        - /opt/swiftmailer:/var/www/sprinklebit/app/spool
-#        - ./web/swagger-sbit/schema.yaml:/var/www/sprinklebit/web/swagger-sbit/schema.yaml
-#      depends_on:
-#        - mysql
-#        - mongo
-#        - rabbitmq
-#        - redis
+    environment:
+      PHP_EXTENSION_XDEBUG: 1
+      PHP_INI_XDEBUG__REMOTE_PORT: 9000
+      PHP_IDE_CONFIG: "serverName=dockerParser"
+      XDEBUG_CONFIG: "remote_port=9000 remote_autostart=1"
