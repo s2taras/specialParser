@@ -3,22 +3,15 @@
 require_once './vendor/autoload.php';
 require_once "simple_html_dom.php";
 
-use Parser\ExcludedCategories;
+use Parser\CategoriesLoopHandler;
+use Parser\MainPageHandler;
 
-$html = new simple_html_dom();
+$mainPageUrl = getenv("MAIN_URL");
 
-// Get main page
-$html->load_file(getenv("MAIN_URL"));
+$mainPage = new MainPageHandler($mainPageUrl);
+$mainPage->initLoadFile();
+$links = $mainPage->getClearedCategoriesLinks();
 
-// Select categories
-$links = $html->find('.sidebar-menu__link');
-
-// Exclude unnecessary categories
-$excludedCategories = ExcludedCategories::getExcludedCategories();
-$newListCategories = [];
-
-foreach ($links as $linkCategory) {
-    if (!array_key_exists($linkCategory->attr['href'], $excludedCategories)) {
-        $newListCategories[] = $linkCategory;
-    }
-}
+$testList[] = $links[1];
+$categoriesLoop = new CategoriesLoopHandler($testList);
+$categoriesLoop->execute();
