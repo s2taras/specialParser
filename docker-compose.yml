@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
   nginx:
+    container_name: shop-nginx
     image: nginx:1.17
     volumes:
       - ./src:/var/www/shop
@@ -13,7 +14,7 @@ services:
       - php
 
   php:
-    container_name: php-shop
+    container_name: shop-php
     image: php-shop
     build:
       dockerfile: ./docker/php/Dockerfile
@@ -26,9 +27,12 @@ services:
       - mysql
 
   mysql:
+    container_name: shop-mysql
     image: mysql:8.0
     ports:
       - 3306:3306
+    expose:
+      - 3306
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
     environment:
