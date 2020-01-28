@@ -2,3 +2,4 @@
 **/vendor/
 .env.parser
 docker/mysql/data
+src/system/storage/cache
