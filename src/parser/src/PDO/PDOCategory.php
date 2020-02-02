@@ -30,7 +30,7 @@ class PDOCategory
         return $date->format('Y-m-d H:m:s');
     }
 
-    public function findCategoryIdByName(string $name)
+    public function findCategoryIdByName($name)
     {
         $sqlFindCategoryByName = "SELECT category_id FROM shop_category_description WHERE `name` = ?";
         $stmtFindCategoryIdByName = $this->getPDO()->prepare($sqlFindCategoryByName);
@@ -47,7 +47,7 @@ class PDOCategory
     public function createCategory($categoryTitle, $parentId=0, $top=1, $column=1, $sortOrder=5, $status=1)
     {
         $sqlCreateCategory = "INSERT INTO shop_category (parent_id,top,`column`,sort_order,`status`,date_added,date_modified)
-                              VALUES(0,1,1,5,1,?,?)";
+                              VALUES(?,?,?,?,?,?,?)";
         $stmtCreateCategory = $this->getPDO()->prepare($sqlCreateCategory);
 
         $dateFormat = $this->getStringDate();

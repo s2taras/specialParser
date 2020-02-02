@@ -8,9 +8,6 @@ use Parser\MainPageHandler;
 
 const MAIN_URL = "https://malinki.prom.ua/";
 
-// $pdo->beginTransaction();
-// $pdo->commit();
-// $pdo->rollback();
 
 $mainPage = new MainPageHandler(MAIN_URL);
 $mainPage->initLoadFile();

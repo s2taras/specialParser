@@ -8,8 +8,8 @@ use Parser\Exception\ProductNotCreatedException;
 
 class PDOProduct
 {
-    public const BASE_IMAGE_PATH = '/var/www/shop/image/catalog/parsed/';
-    public const PROJECT_IMAGE_PATH = 'catalog/parsed/';
+    const BASE_IMAGE_PATH = '/var/www/shop/image/catalog/parsed/';
+    const PROJECT_IMAGE_PATH = 'catalog/parsed/';
 
     /** @var PDO */
     private $pdo;
@@ -33,14 +33,14 @@ class PDOProduct
         return $date->format('Y-m-d H:m:s');
     }
 
-    public function createProduct($productModel, $sku='without sku')
+    public function createProduct($productModel, $sku='without sku', $price=0, $status=1)
     {
         $datetime = $this->getStringDate();
 
-        $sql = "INSERT INTO shop_product (model,date_available,sku,upc,ean,jan,isbn,mpn,location,stock_status_id,manufacturer_id,tax_class_id,date_added,date_modified)
-                VALUES (?,?,?,0,0,0,0,0,0,0,0,0,?,?)";
+        $sql = "INSERT INTO shop_product (model,date_available,sku,upc,ean,jan,isbn,mpn,location,stock_status_id,manufacturer_id,tax_class_id,date_added,date_modified,price,status)
+                VALUES (?,?,?,0,0,0,0,0,0,0,0,0,?,?,?,?)";
         $stmt = $this->getPDO()->prepare($sql);
-        if (!$stmt->execute([$productModel, $datetime, $sku, $datetime, $datetime])) {
+        if (!$stmt->execute([$productModel, $datetime, $sku, $datetime, $datetime, $price, $status])) {
             throw new ProductNotCreatedException("Product: {$productModel}, not created");
         }
     }
@@ -75,7 +75,7 @@ class PDOProduct
         $stmt->execute([$productId, $storeId]);
     }
 
-    public function createProductDescription($productName, $productDescription, $tag, $metaTitle, $metaDescription, $metaKeyword, $language=2, $productId=null)
+    public function createProductDescription($productName, $productDescription, $tag, $metaTitle, $metaDescription, $metaKeyword, $productId=null, $language=2)
     {
         if ($productId === null) {
             $productId = $this->findLastCreatedProductId();
