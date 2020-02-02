@@ -14,6 +14,8 @@ services:
       - php
     depends_on:
       - php
+    networks:
+      - openshop
 
   php:
     container_name: shop-php
@@ -29,6 +31,8 @@ services:
       - mysql
     depends_on:
       - mysql
+    networks:
+      - openshop
 
   mysql:
     container_name: shop-mysql
@@ -44,3 +48,9 @@ services:
       - MYSQL_PASSWORD=shop
       - TZ=Etc/UTC
     restart: on-failure
+    networks:
+      - openshop
+
+networks:
+  openshop:
+    name: openshop
