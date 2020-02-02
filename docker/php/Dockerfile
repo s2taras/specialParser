@@ -24,9 +24,13 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install mcrypt \
     && docker-php-source delete
 
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 COPY ./src /var/www/shop
 
 WORKDIR /var/www/shop
+
+RUN cd parser && composer install
 
 RUN chmod 0777 config.php ./admin/config.php
 RUN chmod -R 0777 ./image/ ./image/cache/ ./image/catalog/ ./system/storage/cache/ ./system/storage/logs/ ./system/storage/download/ ./system/storage/upload/ ./system/storage/modification/

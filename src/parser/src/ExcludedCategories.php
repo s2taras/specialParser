@@ -4,7 +4,7 @@ namespace Parser;
 
 class ExcludedCategories
 {
-    public static function getExcludedCategories(): array
+    public static function getExcludedCategories()
     {
         return [
             '/g7022977-masla-dlya-kutikuly' => 'Масла для кутикулы',

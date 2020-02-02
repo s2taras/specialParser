@@ -6,48 +6,32 @@ use simple_html_dom;
 
 class PageHandler implements PageHandlerInterface
 {
-    private simple_html_dom $simpleHtmlDom;
+    private $simpleHtmlDom;
 
-    private string $url;
+    private $url;
 
-    /**
-     * PageHandler constructor.
-     * @param string $url
-     */
-    public function __construct(string $url)
+    public function __construct($url)
     {
         $this->simpleHtmlDom = new simple_html_dom();
         $this->url = $url;
     }
 
-    /**
-     * @return string
-     */
-    public function getUrl(): string
+    public function getUrl()
     {
         return $this->url;
     }
 
-    /**
-     * @param string $url
-     */
-    public function setUrl(string $url): void
+    public function setUrl($url)
     {
         $this->url = $url;
     }
 
-    /**
-     * @return simple_html_dom
-     */
-    public function getSimpleHtmlDom(): simple_html_dom
+    public function getSimpleHtmlDom()
     {
         return $this->simpleHtmlDom;
     }
 
-    /**
-     * @param simple_html_dom $simpleHtmlDom
-     */
-    public function setSimpleHtmlDom(simple_html_dom $simpleHtmlDom): void
+    public function setSimpleHtmlDom($simpleHtmlDom)
     {
         $this->simpleHtmlDom = $simpleHtmlDom;
     }

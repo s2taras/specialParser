@@ -1,5 +1,9 @@
 <?php
 
+namespace Parser\Exception;
+
+use Exception;
+
 class CategoryNotCreatedException extends Exception
 {
     protected $code = 1;

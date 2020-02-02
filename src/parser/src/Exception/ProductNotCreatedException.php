@@ -1,5 +1,9 @@
 <?php
 
+namespace Parser\Exception;
+
+use Exception;
+
 class ProductNotCreatedException extends Exception
 {
     protected $code = 2;

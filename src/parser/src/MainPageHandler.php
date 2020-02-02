@@ -4,27 +4,17 @@ namespace Parser;
 
 class MainPageHandler extends PageHandler
 {
-    /**
-     * MainPageHandler constructor.
-     * @param string $url
-     */
-    public function __construct(string $url)
+    public function __construct($url)
     {
         parent::__construct($url);
     }
 
-    /**
-     * @return mixed
-     */
     public function getCategoriesLinks()
     {
         return $this->getSimpleHtmlDom()->find('.sidebar-menu__link');
     }
 
-    /**
-     * @return array
-     */
-    public function getClearedCategoriesLinks(): array
+    public function getClearedCategoriesLinks()
     {
         $result = [];
         $links = $this->getCategoriesLinks();

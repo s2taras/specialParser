@@ -2,50 +2,36 @@
 
 namespace Parser;
 
+use Exception;
+
 class CategoriesLoopHandler
 {
-    private array $htmlListCategories;
+    private $htmlListCategories;
 
-    private string $mainUrl;
+    private $mainUrl;
 
-    /**
-     * CategoriesLoopHandler constructor.
-     * @param array $htmlListCategories
-     */
-    public function __construct(array $htmlListCategories)
+    public function __construct($htmlListCategories)
     {
         $this->htmlListCategories = $htmlListCategories;
-        $this->mainUrl = getenv('MAIN_URL');
+        $this->mainUrl = MAIN_URL;
     }
 
-    /**
-     * @return array
-     */
-    public function getHtmlListCategories(): array
+    public function getHtmlListCategories()
     {
         return $this->htmlListCategories;
     }
 
-    /**
-     * @param array $htmlListCategories
-     */
-    public function setHtmlListCategories(array $htmlListCategories): void
+    public function setHtmlListCategories($htmlListCategories)
     {
         $this->htmlListCategories = $htmlListCategories;
     }
 
-    /**
-     * @return string
-     */
     public function getMainUrl()
     {
         return $this->mainUrl;
     }
 
-    /**
-     * @param string $mainUrl
-     */
-    public function setMainUrl($mainUrl): void
+    public function setMainUrl($mainUrl)
     {
         $this->mainUrl = $mainUrl;
     }
@@ -53,11 +39,18 @@ class CategoriesLoopHandler
     public function execute()
     {
         foreach ($this->getHtmlListCategories() as $category) {
-            $this->executeCategoryPage($this->getMainUrl() . $category->href);
+            try {
+                $this->executeCategoryPage($this->getMainUrl() . $category->href);
+            } catch (Exception $ex) {
+                $log  = "Error code: {$ex->getCode()}".PHP_EOL.
+                    "Message: {$ex->getMessage()}".PHP_EOL.
+                    "-------------------------".PHP_EOL;
+                file_put_contents('./error_log_file.log', $log, FILE_APPEND);
+            }
         }
     }
 
-    protected function executeCategoryPage(string $url)
+    protected function executeCategoryPage($url)
     {
         $categoryPage = new CategoryPageHandler($url);
         $categoryPage->initLoadFile();
@@ -79,6 +72,11 @@ class CategoriesLoopHandler
             $smallImageUrl = $itemPage->getSmallImageUrl();
             $title = $itemPage->getTitle();
             $description = $itemPage->getDescription();
+
+            $log  = "Category: {$categoryTitle}".PHP_EOL.
+                    "Product: {$title}".PHP_EOL.
+                    "------------------------".PHP_EOL;
+            file_put_contents('./progress_log.log', $log, FILE_APPEND);
         }
 
         if($nextPage = $categoryPage->hasNext()) {
@@ -87,11 +85,7 @@ class CategoriesLoopHandler
         }
     }
 
-    /**
-     * @param $categoryProductItem
-     * @return bool
-     */
-    protected function isAvailable($categoryProductItem): bool
+    protected function isAvailable($categoryProductItem)
     {
         $productStatus = $categoryProductItem->find('.b-product-line__state', 0)->innertext;
         if ($productStatus == 'Нет в наличии' || $productStatus == 'Ожидается') {
@@ -101,20 +95,12 @@ class CategoriesLoopHandler
         return true;
     }
 
-    /**
-     * @param $categoryProductItem
-     * @return string
-     */
-    protected function getItemUrl($categoryProductItem): string
+    protected function getItemUrl($categoryProductItem)
     {
         return $categoryProductItem->find('.b-centered-image.b-product-line__image-wrapper', 0)->href;
     }
 
-    /**
-     * @param $categoryProductItem
-     * @return int
-     */
-    protected function getProductId($categoryProductItem): int
+    protected function getProductId($categoryProductItem)
     {
         return $categoryProductItem->attr['data-product-id'];
     }

@@ -6,13 +6,13 @@ require_once "simple_html_dom.php";
 use Parser\CategoriesLoopHandler;
 use Parser\MainPageHandler;
 
+const MAIN_URL = "https://malinki.prom.ua/";
+
 // $pdo->beginTransaction();
 // $pdo->commit();
 // $pdo->rollback();
 
-$mainPageUrl = getenv("MAIN_URL");
-
-$mainPage = new MainPageHandler($mainPageUrl);
+$mainPage = new MainPageHandler(MAIN_URL);
 $mainPage->initLoadFile();
 $links = $mainPage->getClearedCategoriesLinks();
 

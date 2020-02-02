@@ -4,7 +4,7 @@ namespace Parser\PDO;
 
 use DateTime;
 use PDO;
-use ProductNotCreatedException;
+use Parser\Exception\ProductNotCreatedException;
 
 class PDOProduct
 {

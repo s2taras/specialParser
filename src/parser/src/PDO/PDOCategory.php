@@ -2,7 +2,7 @@
 
 namespace Parser\PDO;
 
-use CategoryNotCreatedException;
+use Parser\Exception\CategoryNotCreatedException;
 use DateTime;
 use PDO;
 
