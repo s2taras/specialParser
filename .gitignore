@@ -3,3 +3,5 @@
 .env.parser
 docker/mysql/data
 src/system/storage/cache
+src/image/
+src/system/

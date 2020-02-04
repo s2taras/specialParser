@@ -13,6 +13,6 @@ $mainPage = new MainPageHandler(MAIN_URL);
 $mainPage->initLoadFile();
 $links = $mainPage->getClearedCategoriesLinks();
 
-$testList[] = $links[1];
-$categoriesLoop = new CategoriesLoopHandler($testList);
+// $testList[] = $links[1];
+$categoriesLoop = new CategoriesLoopHandler($links);
 $categoriesLoop->execute();

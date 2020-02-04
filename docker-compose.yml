@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3"
 
 services:
   nginx:
@@ -14,8 +14,6 @@ services:
       - php
     depends_on:
       - php
-    networks:
-      - openshop
 
   php:
     container_name: shop-php
@@ -26,13 +24,11 @@ services:
     volumes:
       - ./src:/var/www/shop
     ports:
-      - 9999:9000
+      - 9000:9000
     links:
       - mysql
     depends_on:
       - mysql
-    networks:
-      - openshop
 
   mysql:
     container_name: shop-mysql
@@ -48,9 +44,3 @@ services:
       - MYSQL_PASSWORD=shop
       - TZ=Etc/UTC
     restart: on-failure
-    networks:
-      - openshop
-
-networks:
-  openshop:
-    name: openshop
