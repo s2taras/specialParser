@@ -5,3 +5,4 @@ docker/mysql/data
 src/system/storage/cache
 src/image/
 src/system/
+src/system/storage/logs/error.log
