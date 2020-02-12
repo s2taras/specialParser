@@ -7,3 +7,4 @@ src/image/
 src/system/
 src/system/storage/logs/error.log
 src/image/cache/catalog
+docker/nginx/certbot

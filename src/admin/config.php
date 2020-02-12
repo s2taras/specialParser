@@ -1,11 +1,11 @@
 <?php
 // HTTP
-define('HTTP_SERVER', 'http://easybeautypro.com.ua/admin/');
-define('HTTP_CATALOG', 'http://easybeautypro.com.ua/');
+define('HTTP_SERVER', 'https://easybeautypro.com.ua/admin/');
+define('HTTP_CATALOG', 'https://easybeautypro.com.ua/');
 
 // HTTPS
-define('HTTPS_SERVER', 'http://easybeautypro.com.ua/admin/');
-define('HTTPS_CATALOG', 'http://easybeautypro.com.ua/');
+define('HTTPS_SERVER', 'https://easybeautypro.com.ua/admin/');
+define('HTTPS_CATALOG', 'https://easybeautypro.com.ua/');
 
 // DIR
 define('DIR_APPLICATION', '/var/www/shop/admin/');

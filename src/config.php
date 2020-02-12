@@ -1,9 +1,9 @@
 <?php
 // HTTP
-define('HTTP_SERVER', 'http://easybeautypro.com.ua/');
+define('HTTP_SERVER', 'https://easybeautypro.com.ua/');
 
 // HTTPS
-define('HTTPS_SERVER', 'http://easybeautypro.com.ua/');
+define('HTTPS_SERVER', 'https://easybeautypro.com.ua/');
 
 // DIR
 define('DIR_APPLICATION', '/var/www/shop/catalog/');
