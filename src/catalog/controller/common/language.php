@@ -1,9 +1,10 @@
 <?php
+// *	@source		See SOURCE.txt for source and other copyright.
+// *	@license	GNU General Public License version 3; see LICENSE.txt
+
 class ControllerCommonLanguage extends Controller {
 	public function index() {
 		$this->load->language('common/language');
-
-		$data['text_language'] = $this->language->get('text_language');
 
 		$data['action'] = $this->url->link('common/language/language', '', $this->request->server['HTTPS']);
 
@@ -18,15 +19,21 @@ class ControllerCommonLanguage extends Controller {
 		foreach ($results as $result) {
 			if ($result['status']) {
 				$data['languages'][] = array(
-					'name'  => $result['name'],
-					'code'  => $result['code'],
-					'image' => $result['image']
+					'name' => $result['name'],
+					'code' => $result['code']
 				);
 			}
 		}
 
 		if (!isset($this->request->get['route'])) {
-			$data['redirect'] = $this->url->link('common/home');
+			
+			if($this->config->get('config_seo_pro')){ 
+				$redirect_data = ['route' => 'common/home', 'url' => '', 'protocol' => $this->request->server['HTTPS']];
+				$data['redirect'] = base64_encode(json_encode($redirect_data));
+			} else {
+				$data['redirect'] = $this->url->link('common/home');
+			};
+			
 		} else {
 			$url_data = $this->request->get;
 
@@ -41,24 +48,53 @@ class ControllerCommonLanguage extends Controller {
 			if ($url_data) {
 				$url = '&' . urldecode(http_build_query($url_data, '', '&'));
 			}
-
-			$data['redirect'] = $this->url->link($route, $url, $this->request->server['HTTPS']);
+			
+			if($this->config->get('config_seo_pro')){ 
+				$redirect_data = ['route' => $route, 'url' => $url, 'protocol' => $this->request->server['HTTPS']];
+				$data['redirect'] = base64_encode(json_encode($redirect_data));
+			} else {
+				$data['redirect'] = $this->url->link($route, $url, $this->request->server['HTTPS']);
+			};
+			
 		}
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/common/language.tpl')) {
-			return $this->load->view($this->config->get('config_template') . '/template/common/language.tpl', $data);
-		} else {
-			return $this->load->view('default/template/common/language.tpl', $data);
-		}
+		return $this->load->view('common/language', $data);
 	}
 
 	public function language() {
+		if($this->config->get('config_seo_pro'))
+			$this->seo_language();
+			
 		if (isset($this->request->post['code'])) {
 			$this->session->data['language'] = $this->request->post['code'];
 		}
 
 		if (isset($this->request->post['redirect'])) {
 			$this->response->redirect($this->request->post['redirect']);
+		} else {
+			$this->response->redirect($this->url->link('common/home'));
+		}
+	}
+	
+	private function seo_language() {
+		if (isset($this->request->post['code'])) {
+			$this->session->data['language'] = $this->request->post['code'];
+			$languages = $this->model_localisation_language->getLanguages();
+			if (isset($languages[$this->request->post['code']])) {
+				$this->config->set('config_language_id', $languages[$this->request->post['code']]['language_id']);	
+			}
+		}
+
+		if (isset($this->request->post['redirect'])) {
+			$redirect = $this->request->post['redirect'];
+			$redirect_data = json_decode(base64_decode($redirect), true);
+			extract($redirect_data);
+			if(isset($route)&& isset($url) && isset($protocol)) {
+				$redirect_url = $this->url->link($route, $url, $protocol);
+			} else {
+				$redirect_url = $this->url->link('common/home');
+			}
+			$this->response->redirect($redirect_url);
 		} else {
 			$this->response->redirect($this->url->link('common/home'));
 		}

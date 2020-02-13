@@ -1,4 +1,7 @@
 <?php
+// *	@source		See SOURCE.txt for source and other copyright.
+// *	@license	GNU General Public License version 3; see LICENSE.txt
+
 class ControllerProductSpecial extends Controller {
 	public function index() {
 		$this->load->language('product/special');
@@ -9,26 +12,30 @@ class ControllerProductSpecial extends Controller {
 
 		if (isset($this->request->get['sort'])) {
 			$sort = $this->request->get['sort'];
+			$this->document->setRobots('noindex,follow');
 		} else {
 			$sort = 'p.sort_order';
 		}
 
 		if (isset($this->request->get['order'])) {
 			$order = $this->request->get['order'];
+			$this->document->setRobots('noindex,follow');
 		} else {
 			$order = 'ASC';
 		}
 
 		if (isset($this->request->get['page'])) {
 			$page = $this->request->get['page'];
+			$this->document->setRobots('noindex,follow');
 		} else {
 			$page = 1;
 		}
 
 		if (isset($this->request->get['limit'])) {
 			$limit = (int)$this->request->get['limit'];
+			$this->document->setRobots('noindex,follow');
 		} else {
-			$limit = $this->config->get('config_product_limit');
+			$limit = $this->config->get('theme_' . $this->config->get('config_theme') . '_product_limit');
 		}
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -63,25 +70,7 @@ class ControllerProductSpecial extends Controller {
 			'href' => $this->url->link('product/special', $url)
 		);
 
-		$data['heading_title'] = $this->language->get('heading_title');
-
-		$data['text_empty'] = $this->language->get('text_empty');
-		$data['text_quantity'] = $this->language->get('text_quantity');
-		$data['text_manufacturer'] = $this->language->get('text_manufacturer');
-		$data['text_model'] = $this->language->get('text_model');
-		$data['text_price'] = $this->language->get('text_price');
-		$data['text_tax'] = $this->language->get('text_tax');
-		$data['text_points'] = $this->language->get('text_points');
 		$data['text_compare'] = sprintf($this->language->get('text_compare'), (isset($this->session->data['compare']) ? count($this->session->data['compare']) : 0));
-		$data['text_sort'] = $this->language->get('text_sort');
-		$data['text_limit'] = $this->language->get('text_limit');
-
-		$data['button_cart'] = $this->language->get('button_cart');
-		$data['button_wishlist'] = $this->language->get('button_wishlist');
-		$data['button_compare'] = $this->language->get('button_compare');
-		$data['button_list'] = $this->language->get('button_list');
-		$data['button_grid'] = $this->language->get('button_grid');
-		$data['button_continue'] = $this->language->get('button_continue');
 
 		$data['compare'] = $this->url->link('product/compare');
 
@@ -100,25 +89,25 @@ class ControllerProductSpecial extends Controller {
 
 		foreach ($results as $result) {
 			if ($result['image']) {
-				$image = $this->model_tool_image->resize($result['image'], $this->config->get('config_image_product_width'), $this->config->get('config_image_product_height'));
+				$image = $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
 			} else {
-				$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('config_image_product_width'), $this->config->get('config_image_product_height'));
+				$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
 			}
 
-			if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
-				$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')));
+			if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+				$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 			} else {
 				$price = false;
 			}
 
 			if ((float)$result['special']) {
-				$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')));
+				$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 			} else {
 				$special = false;
 			}
 
 			if ($this->config->get('config_tax')) {
-				$tax = $this->currency->format((float)$result['special'] ? $result['special'] : $result['price']);
+				$tax = $this->currency->format((float)$result['special'] ? $result['special'] : $result['price'], $this->session->data['currency']);
 			} else {
 				$tax = false;
 			}
@@ -133,7 +122,7 @@ class ControllerProductSpecial extends Controller {
 				'product_id'  => $result['product_id'],
 				'thumb'       => $image,
 				'name'        => $result['name'],
-				'description' => utf8_substr(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8')), 0, $this->config->get('config_product_description_length')) . '..',
+				'description' => utf8_substr(trim(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8'))), 0, $this->config->get('theme_' . $this->config->get('config_theme') . '_product_description_length')) . '..',
 				'price'       => $price,
 				'special'     => $special,
 				'tax'         => $tax,
@@ -219,7 +208,7 @@ class ControllerProductSpecial extends Controller {
 
 		$data['limits'] = array();
 
-		$limits = array_unique(array($this->config->get('config_product_limit'), 25, 50, 75, 100));
+		$limits = array_unique(array($this->config->get('theme_' . $this->config->get('config_theme') . '_product_limit'), 25, 50, 75, 100));
 
 		sort($limits);
 
@@ -257,15 +246,17 @@ class ControllerProductSpecial extends Controller {
 
 		// http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html
 		if ($page == 1) {
-		    $this->document->addLink($this->url->link('product/special', '', 'SSL'), 'canonical');
-		} elseif ($page == 2) {
-		    $this->document->addLink($this->url->link('product/special', '', 'SSL'), 'prev');
+		    $this->document->addLink($this->url->link('product/special', '', true), 'canonical');
 		} else {
-		    $this->document->addLink($this->url->link('product/special', 'page='. ($page - 1), 'SSL'), 'prev');
+		    $this->document->addLink($this->url->link('product/special', 'page='. $page , true), 'canonical');
+		}		
+		
+		if ($page > 1) {
+			$this->document->addLink($this->url->link('product/special', (($page - 2) ? '&page='. ($page - 1) : ''), true), 'prev');
 		}
 
 		if ($limit && ceil($product_total / $limit) > $page) {
-		    $this->document->addLink($this->url->link('product/special', 'page='. ($page + 1), 'SSL'), 'next');
+		    $this->document->addLink($this->url->link('product/special', 'page='. ($page + 1), true), 'next');
 		}
 
 		$data['sort'] = $sort;
@@ -281,10 +272,6 @@ class ControllerProductSpecial extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/product/special.tpl')) {
-			$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/product/special.tpl', $data));
-		} else {
-			$this->response->setOutput($this->load->view('default/template/product/special.tpl', $data));
-		}
+		$this->response->setOutput($this->load->view('product/special', $data));
 	}
 }

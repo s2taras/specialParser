@@ -1,9 +1,10 @@
 <?php
+// *	@source		See SOURCE.txt for source and other copyright.
+// *	@license	GNU General Public License version 3; see LICENSE.txt
+
 class ControllerAccountLogout extends Controller {
 	public function index() {
 		if ($this->customer->isLogged()) {
-			$this->event->trigger('pre.customer.logout');
-
 			$this->customer->logout();
 
 			unset($this->session->data['shipping_address']);
@@ -19,14 +20,13 @@ class ControllerAccountLogout extends Controller {
 			unset($this->session->data['voucher']);
 			unset($this->session->data['vouchers']);
 
-			$this->event->trigger('post.customer.logout');
-
-			$this->response->redirect($this->url->link('account/logout', '', 'SSL'));
+			$this->response->redirect($this->url->link('account/logout', '', true));
 		}
 
 		$this->load->language('account/logout');
 
 		$this->document->setTitle($this->language->get('heading_title'));
+		$this->document->setRobots('noindex,follow');
 
 		$data['breadcrumbs'] = array();
 
@@ -37,19 +37,13 @@ class ControllerAccountLogout extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_account'),
-			'href' => $this->url->link('account/account', '', 'SSL')
+			'href' => $this->url->link('account/account', '', true)
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_logout'),
-			'href' => $this->url->link('account/logout', '', 'SSL')
+			'href' => $this->url->link('account/logout', '', true)
 		);
-
-		$data['heading_title'] = $this->language->get('heading_title');
-
-		$data['text_message'] = $this->language->get('text_message');
-
-		$data['button_continue'] = $this->language->get('button_continue');
 
 		$data['continue'] = $this->url->link('common/home');
 
@@ -60,10 +54,6 @@ class ControllerAccountLogout extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/common/success.tpl')) {
-			$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/common/success.tpl', $data));
-		} else {
-			$this->response->setOutput($this->load->view('default/template/common/success.tpl', $data));
-		}
+		$this->response->setOutput($this->load->view('common/success', $data));
 	}
 }

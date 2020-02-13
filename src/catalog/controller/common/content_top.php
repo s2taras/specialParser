@@ -1,4 +1,7 @@
 <?php
+// *	@source		See SOURCE.txt for source and other copyright.
+// *	@license	GNU General Public License version 3; see LICENSE.txt
+
 class ControllerCommonContentTop extends Controller {
 	public function index() {
 		$this->load->model('design/layout');
@@ -17,6 +20,12 @@ class ControllerCommonContentTop extends Controller {
 			$path = explode('_', (string)$this->request->get['path']);
 
 			$layout_id = $this->model_catalog_category->getCategoryLayoutId(end($path));
+		}
+		
+		if ($route == 'product/manufacturer/info' && isset($this->request->get['manufacturer_id'])) {
+			$this->load->model('catalog/manufacturer');
+		
+			$layout_id = $this->model_catalog_manufacturer->getManufacturerLayoutId($this->request->get['manufacturer_id']);
 		}
 
 		if ($route == 'product/product' && isset($this->request->get['product_id'])) {
@@ -39,7 +48,7 @@ class ControllerCommonContentTop extends Controller {
 			$layout_id = $this->config->get('config_layout_id');
 		}
 
-		$this->load->model('extension/module');
+		$this->load->model('setting/module');
 
 		$data['modules'] = array();
 
@@ -48,23 +57,27 @@ class ControllerCommonContentTop extends Controller {
 		foreach ($modules as $module) {
 			$part = explode('.', $module['code']);
 
-			if (isset($part[0]) && $this->config->get($part[0] . '_status')) {
-				$data['modules'][] = $this->load->controller('module/' . $part[0]);
+			if (isset($part[0]) && $this->config->get('module_' . $part[0] . '_status')) {
+				$module_data = $this->load->controller('extension/module/' . $part[0]);
+
+				if ($module_data) {
+					$data['modules'][] = $module_data;
+				}
 			}
 
 			if (isset($part[1])) {
-				$setting_info = $this->model_extension_module->getModule($part[1]);
+				$setting_info = $this->model_setting_module->getModule($part[1]);
 
 				if ($setting_info && $setting_info['status']) {
-					$data['modules'][] = $this->load->controller('module/' . $part[0], $setting_info);
+					$output = $this->load->controller('extension/module/' . $part[0], $setting_info);
+
+					if ($output) {
+						$data['modules'][] = $output;
+					}
 				}
 			}
 		}
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/common/content_top.tpl')) {
-			return $this->load->view($this->config->get('config_template') . '/template/common/content_top.tpl', $data);
-		} else {
-			return $this->load->view('default/template/common/content_top.tpl', $data);
-		}
+		return $this->load->view('common/content_top', $data);
 	}
 }

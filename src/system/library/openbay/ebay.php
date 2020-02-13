@@ -3,8 +3,8 @@ namespace openbay;
 
 final class Ebay {
 	private $token;
-	private $enc1;
-	private $enc2;
+    private $encryption_key;
+    private $encryption_iv;
 	private $url = 'https://uk.openbaypro.com/';
 	private $registry;
 	private $no_log = array('notification/getPublicNotifications/', 'setup/getEbayCategories/', 'item/getItemAllList/', 'account/validate/', 'item/getItemListLimited/');
@@ -15,8 +15,6 @@ final class Ebay {
 		$this->registry = $registry;
 		$this->token = $this->config->get('ebay_token');
 		$this->secret = $this->config->get('ebay_secret');
-		$this->enc1 = $this->config->get('ebay_string1');
-		$this->enc2 = $this->config->get('ebay_string2');
 		$this->logging = $this->config->get('ebay_logging');
 		$this->tax = $this->config->get('ebay_tax');
 		$this->server = 1;
@@ -26,11 +24,30 @@ final class Ebay {
 		if ($this->logging == 1) {
 			$this->setLogger();
 		}
+
+		$this->setEncryptionKey($this->config->get('ebay_encryption_key'));
+		$this->setEncryptionIv($this->config->get('ebay_encryption_iv'));
 	}
 
 	public function __get($name) {
 		return $this->registry->get($name);
 	}
+
+    public function getEncryptionKey() {
+        return $this->encryption_key;
+    }
+
+	public function setEncryptionKey($key) {
+	    $this->encryption_key = $key;
+    }
+
+    public function getEncryptionIv() {
+        return $this->encryption_iv;
+    }
+
+    public function setEncryptionIv($encryption_iv) {
+        $this->encryption_iv = $encryption_iv;
+    }
 
 	public function call($call, array $post = null, array $options = array(), $content_type = 'json', $status_override = false) {
 		if ($this->config->get('ebay_status') == 1 || $status_override == true) {
@@ -44,16 +61,20 @@ final class Ebay {
 			if (defined("HTTPS_CATALOG")) {
 				$domain = HTTPS_CATALOG;
 			} else {
-				$domain = HTTPS_SERVER;
+				$domain = $this->config->get('config_url');
 			}
 
-			$data = array('token' => $this->token, 'secret' => $this->secret, 'server' => $this->server, 'domain' => $domain, 'openbay_version' => (int)$this->config->get('openbay_version'), 'opencart_version' => VERSION, 'data' => $post, 'content_type' => $content_type, 'language' => $this->config->get('openbay_language'));
+            $headers = array();
+            $headers[] = 'X-Endpoint-Version: 2';
+
+			$data = array('token' => $this->token, 'secret' => $this->secret, 'server' => $this->server, 'domain' => $domain, 'openbay_version' => (int)$this->config->get('feed_openbaypro_version'), 'opencart_version' => VERSION, 'data' => $post, 'content_type' => $content_type, 'language' => $this->config->get('openbay_language'));
 
 			$defaults = array(
+                CURLOPT_HEADER      	=> 0,
+                CURLOPT_HTTPHEADER      => $headers,
 				CURLOPT_POST            => 1,
-				CURLOPT_HEADER          => 0,
 				CURLOPT_URL             => $this->url . $call,
-				CURLOPT_USERAGENT       => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1",
+				CURLOPT_USERAGENT       => "OpenBay Pro for eBay",
 				CURLOPT_FRESH_CONNECT   => 1,
 				CURLOPT_RETURNTRANSFER  => 1,
 				CURLOPT_FORBID_REUSE    => 1,
@@ -63,12 +84,12 @@ final class Ebay {
 				CURLOPT_POSTFIELDS      => http_build_query($data, '', "&")
 			);
 
-			$ch = curl_init();
-			curl_setopt_array($ch, ($options + $defaults));
-			if (! $result = curl_exec($ch)) {
-				$this->log('call() - Curl Failed ' . curl_error($ch) . ' ' . curl_errno($ch));
+			$curl = curl_init();
+			curl_setopt_array($curl, ($options + $defaults));
+			if (! $result = curl_exec($curl)) {
+				$this->log('call() - Curl Failed ' . curl_error($curl) . ' ' . curl_errno($curl));
 			}
-			curl_close($ch);
+			curl_close($curl);
 
 			if (!in_array($call, $this->no_log)) {
 				$this->log('call() - Result of : "' . $result . '"');
@@ -113,16 +134,19 @@ final class Ebay {
 			if (defined("HTTPS_CATALOG")) {
 				$domain = HTTPS_CATALOG;
 			} else {
-				$domain = HTTPS_SERVER;
+				$domain = $this->config->get('config_url');
 			}
 
-			$data = array('token' => $this->token, 'secret' => $this->secret, 'server' => $this->server, 'domain' => $domain, 'openbay_version' => (int)$this->config->get('openbay_version'), 'opencart_version' => VERSION, 'data' => $post, 'content_type' => $content_type, 'language' => $this->config->get('openbay_language'));
+            $headers = array();
+            $headers[] = 'X-Endpoint-Version: 2';
+
+			$data = array('token' => $this->token, 'secret' => $this->secret, 'server' => $this->server, 'domain' => $domain, 'openbay_version' => (int)$this->config->get('feed_openbaypro_version'), 'opencart_version' => VERSION, 'data' => $post, 'content_type' => $content_type, 'language' => $this->config->get('openbay_language'));
 
 			$defaults = array(
+                CURLOPT_HEADER          => $headers,
 				CURLOPT_POST            => 1,
-				CURLOPT_HEADER          => 0,
 				CURLOPT_URL             => $this->url . $call,
-				CURLOPT_USERAGENT       => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1",
+				CURLOPT_USERAGENT       => "OpenBay Pro for eBay",
 				CURLOPT_FRESH_CONNECT   => 1,
 				CURLOPT_RETURNTRANSFER  => 0,
 				CURLOPT_FORBID_REUSE    => 1,
@@ -132,19 +156,17 @@ final class Ebay {
 				CURLOPT_POSTFIELDS      => http_build_query($data, '', "&")
 			);
 
-			$ch = curl_init();
-			curl_setopt_array($ch, ($options + $defaults));
-			curl_exec($ch);
-			$this->log(curl_error($ch));
-			curl_close($ch);
+			$curl = curl_init();
+			curl_setopt_array($curl, ($options + $defaults));
+			curl_exec($curl);
+			$this->log(curl_error($curl));
+			curl_close($curl);
 		} else {
 			$this->log('openbay_noresponse_call() - OpenBay Pro not active . ');
 		}
 	}
 
 	private function setLogger() {
-		$this->load->library('log');
-
 		if(file_exists(DIR_LOGS . 'ebaylog.log')) {
 			if(filesize(DIR_LOGS . 'ebaylog.log') > ($this->max_log_size * 1000000)) {
 				rename(DIR_LOGS . 'ebaylog.log', DIR_LOGS . '_ebaylog_' . date('Y-m-d_H-i-s') . '.log');
@@ -158,27 +180,11 @@ final class Ebay {
 		if ($this->logging == 1) {
 			if (function_exists('getmypid')) {
 				$process_id = getmypid();
-				$data = $process_id . ' - ' . $data;
+				$data = $process_id . ' - ' . print_r($data, true);
 			}
 
-			if ($write == true) {
-				$this->logger->write($data);
-			}
+            $this->logger->write($data);
 		}
-	}
-
-	public function decryptArgs($crypt, $is_base_64 = true) {
-		if ($is_base_64) {
-			$crypt = base64_decode($crypt, true);
-			if (!$crypt) {
-				return false;
-			}
-		}
-
-		$token = $this->openbay->pbkdf2($this->enc1, $this->enc2, 1000, 32);
-		$data = $this->openbay->decrypt($crypt, $token);
-
-		return $data;
 	}
 
 	public function getServer() {
@@ -538,7 +544,7 @@ final class Ebay {
 
 		$openstock = false;
 		if ($this->openbay->addonLoad('openstock') == true) {
-			$this->load->model('module/openstock');
+			$this->load->model('extension/module/openstock');
 			$openstock = true;
 		}
 
@@ -573,7 +579,7 @@ final class Ebay {
 		//loop through ended listings, if back in stock and not multi var - relist it
 		foreach ($linked_ended_items as $item) {
 			if ($openstock == true) {
-				$options = $this->model_module_openstock->getVariants($item['productId']);
+				$options = $this->model_extension_module_openstock->getVariants($item['productId']);
 			} else {
 				$options = array();
 			}
@@ -619,7 +625,7 @@ final class Ebay {
 				} else {
 					//get any options that are set for this product
 					if ($openstock == true) {
-						$options = $this->model_module_openstock->getVariants($item['productId']);
+						$options = $this->model_extension_module_openstock->getVariants($item['productId']);
 					} else {
 						$options = array();
 					}
@@ -706,14 +712,14 @@ final class Ebay {
 			$this->log('productUpdateListen(' . $product_id . ') - listing found (' . $item_id . ')');
 
 			if ($this->openbay->addonLoad('openstock') && (isset($product['has_option']) && $product['has_option'] == 1)) {
-				$this->load->model('module/openstock');
+				$this->load->model('extension/module/openstock');
 				$this->load->model('tool/image');
 				$this->load->model('catalog/product');
 
 				$this->log('productUpdateListen(' . $product_id . ') - Variant');
 
 				if (!isset($data['variant'])) {
-					$variants = $this->model_module_openstock->getVariants($product_id);
+					$variants = $this->model_extension_module_openstock->getVariants($product_id);
 				} else {
 					$variants = $data['variant'];
 				}
@@ -901,7 +907,7 @@ final class Ebay {
 			$status_sql = ' AND `status` = 1';
 		}
 
-		$qry = $this->db->query("SELECT `product_id` FROM `" . DB_PREFIX . "ebay_listing` WHERE `ebay_item_id` = '" . $this->db->escape($ebay_item) . "'" . $status_sql . " LIMIT 1");
+		$qry = $this->db->query("SELECT `product_id` FROM `" . DB_PREFIX . "ebay_listing` WHERE `ebay_item_id` = '" . $this->db->escape($ebay_item) . "'" . $status_sql . " ORDER BY `status` DESC, `ebay_listing_id` DESC LIMIT 1");
 
 		if (!$qry->num_rows) {
 			return false;
@@ -921,7 +927,7 @@ final class Ebay {
 	}
 
 	public function validate() {
-		if ($this->config->get('ebay_status') != 0 && $this->config->get('ebay_token') != '' && $this->config->get('ebay_secret') != '' && $this->config->get('ebay_string1') != '' && $this->config->get('ebay_string2') != '') {
+		if ($this->config->get('ebay_status') != 0 && $this->config->get('ebay_token') != '' && $this->config->get('ebay_secret') != '' && $this->config->get('ebay_encryption_key') != '' && $this->config->get('ebay_encryption_iv') != '') {
 			return true;
 		} else {
 			return false;
@@ -973,27 +979,27 @@ final class Ebay {
 	}
 
 	private function getImageInfo($url) {
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_NOBODY, true);
+		$curl = curl_init($url);
+		curl_setopt($curl, CURLOPT_NOBODY, true);
 
-		if(curl_exec($ch) === false) {
-			$this->log('Curl Error: ' . curl_error($ch));
+		if(curl_exec($curl) === false) {
+			$this->log('Curl Error: ' . curl_error($curl));
 		}
 
-		$header_response = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		$header_response = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
 		$this->log($header_response);
 
-		curl_close($ch);
+		curl_close($curl);
 
 		return $header_response;
 	}
 
-	private function getImageCopy($url, $new_image) {
+	private function getImageCopy($url, $image_new) {
 		$handle = @fopen($url, 'r');
 
 		if ($handle !== false) {
-			if (!@copy($url, $new_image)) {
+			if (!@copy($url, $image_new)) {
 				$this->log('getImages() - FAILED COPY: ' . $url);
 				$this->log(print_r(error_get_last(), true));
 				return false;
@@ -1448,7 +1454,7 @@ final class Ebay {
 							  `CategoryID` char(100) NOT NULL,
 							  `CategoryName` char(100) NOT NULL,
 							  PRIMARY KEY (`ebay_store_category_id`)
-							) ENGINE=MyISAM  DEFAULT CHARSET=latin1;");
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;");
 
 				if (!empty($store['settings']['categories'])) {
 					foreach ($store['settings']['categories'] as $cat1) {

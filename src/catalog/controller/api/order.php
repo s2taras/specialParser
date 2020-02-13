@@ -94,6 +94,8 @@ class ControllerApiOrder extends Controller {
 			}
 
 			if (!$json) {
+				$json['success'] = $this->language->get('text_success');
+				
 				$order_data = array();
 
 				// Store Details
@@ -109,7 +111,6 @@ class ControllerApiOrder extends Controller {
 				$order_data['lastname'] = $this->session->data['customer']['lastname'];
 				$order_data['email'] = $this->session->data['customer']['email'];
 				$order_data['telephone'] = $this->session->data['customer']['telephone'];
-				$order_data['fax'] = $this->session->data['customer']['fax'];
 				$order_data['custom_field'] = $this->session->data['customer']['custom_field'];
 
 				// Payment Details
@@ -224,7 +225,7 @@ class ControllerApiOrder extends Controller {
 					foreach ($this->session->data['vouchers'] as $voucher) {
 						$order_data['vouchers'][] = array(
 							'description'      => $voucher['description'],
-							'code'             => substr(token(32), 0, 10),
+							'code'             => token(10),
 							'to_name'          => $voucher['to_name'],
 							'to_email'         => $voucher['to_email'],
 							'from_name'        => $voucher['from_name'],
@@ -237,37 +238,47 @@ class ControllerApiOrder extends Controller {
 				}
 
 				// Order Totals
-				$this->load->model('extension/extension');
+				$this->load->model('setting/extension');
 
-				$order_data['totals'] = array();
-				$total = 0;
+				$totals = array();
 				$taxes = $this->cart->getTaxes();
+				$total = 0;
 
+				// Because __call can not keep var references so we put them into an array.
+				$total_data = array(
+					'totals' => &$totals,
+					'taxes'  => &$taxes,
+					'total'  => &$total
+				);
+			
 				$sort_order = array();
 
-				$results = $this->model_extension_extension->getExtensions('total');
+				$results = $this->model_setting_extension->getExtensions('total');
 
 				foreach ($results as $key => $value) {
-					$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
+					$sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
 				}
 
 				array_multisort($sort_order, SORT_ASC, $results);
 
 				foreach ($results as $result) {
-					if ($this->config->get($result['code'] . '_status')) {
-						$this->load->model('total/' . $result['code']);
-
-						$this->{'model_total_' . $result['code']}->getTotal($order_data['totals'], $total, $taxes);
+					if ($this->config->get('total_' . $result['code'] . '_status')) {
+						$this->load->model('extension/total/' . $result['code']);
+						
+						// We have to put the totals in an array so that they pass by reference.
+						$this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
 					}
 				}
 
 				$sort_order = array();
 
-				foreach ($order_data['totals'] as $key => $value) {
+				foreach ($total_data['totals'] as $key => $value) {
 					$sort_order[$key] = $value['sort_order'];
 				}
 
-				array_multisort($sort_order, SORT_ASC, $order_data['totals']);
+				array_multisort($sort_order, SORT_ASC, $total_data['totals']);
+
+				$order_data = array_merge($order_data, $total_data);
 
 				if (isset($this->request->post['comment'])) {
 					$order_data['comment'] = $this->request->post['comment'];
@@ -275,18 +286,16 @@ class ControllerApiOrder extends Controller {
 					$order_data['comment'] = '';
 				}
 
-				$order_data['total'] = $total;
-
 				if (isset($this->request->post['affiliate_id'])) {
 					$subtotal = $this->cart->getSubTotal();
 
 					// Affiliate
-					$this->load->model('affiliate/affiliate');
+					$this->load->model('account/customer');
 
-					$affiliate_info = $this->model_affiliate_affiliate->getAffiliate($this->request->post['affiliate_id']);
+					$affiliate_info = $this->model_account_customer->getAffiliate($this->request->post['affiliate_id']);
 
 					if ($affiliate_info) {
-						$order_data['affiliate_id'] = $affiliate_info['affiliate_id'];
+						$order_data['affiliate_id'] = $affiliate_info['customer_id'];
 						$order_data['commission'] = ($subtotal / 100) * $affiliate_info['commission'];
 					} else {
 						$order_data['affiliate_id'] = 0;
@@ -304,9 +313,9 @@ class ControllerApiOrder extends Controller {
 				}
 
 				$order_data['language_id'] = $this->config->get('config_language_id');
-				$order_data['currency_id'] = $this->currency->getId();
-				$order_data['currency_code'] = $this->currency->getCode();
-				$order_data['currency_value'] = $this->currency->getValue($this->currency->getCode());
+				$order_data['currency_id'] = $this->currency->getId($this->session->data['currency']);
+				$order_data['currency_code'] = $this->session->data['currency'];
+				$order_data['currency_value'] = $this->currency->getValue($this->session->data['currency']);
 				$order_data['ip'] = $this->request->server['REMOTE_ADDR'];
 
 				if (!empty($this->request->server['HTTP_X_FORWARDED_FOR'])) {
@@ -341,16 +350,10 @@ class ControllerApiOrder extends Controller {
 				}
 
 				$this->model_checkout_order->addOrderHistory($json['order_id'], $order_status_id);
-
-				$json['success'] = $this->language->get('text_success');
+				
+				// clear cart since the order has already been successfully stored.
+				$this->cart->clear();
 			}
-		}
-
-		if (isset($this->request->server['HTTP_ORIGIN'])) {
-			$this->response->addHeader('Access-Control-Allow-Origin: ' . $this->request->server['HTTP_ORIGIN']);
-			$this->response->addHeader('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-			$this->response->addHeader('Access-Control-Max-Age: 1000');
-			$this->response->addHeader('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 		}
 
 		$this->response->addHeader('Content-Type: application/json');
@@ -461,6 +464,8 @@ class ControllerApiOrder extends Controller {
 				}
 
 				if (!$json) {
+					$json['success'] = $this->language->get('text_success');
+					
 					$order_data = array();
 
 					// Store Details
@@ -476,7 +481,6 @@ class ControllerApiOrder extends Controller {
 					$order_data['lastname'] = $this->session->data['customer']['lastname'];
 					$order_data['email'] = $this->session->data['customer']['email'];
 					$order_data['telephone'] = $this->session->data['customer']['telephone'];
-					$order_data['fax'] = $this->session->data['customer']['fax'];
 					$order_data['custom_field'] = $this->session->data['customer']['custom_field'];
 
 					// Payment Details
@@ -604,37 +608,47 @@ class ControllerApiOrder extends Controller {
 					}
 
 					// Order Totals
-					$this->load->model('extension/extension');
+					$this->load->model('setting/extension');
 
-					$order_data['totals'] = array();
-					$total = 0;
+					$totals = array();
 					$taxes = $this->cart->getTaxes();
-
+					$total = 0;
+					
+					// Because __call can not keep var references so we put them into an array. 
+					$total_data = array(
+						'totals' => &$totals,
+						'taxes'  => &$taxes,
+						'total'  => &$total
+					);
+			
 					$sort_order = array();
 
-					$results = $this->model_extension_extension->getExtensions('total');
+					$results = $this->model_setting_extension->getExtensions('total');
 
 					foreach ($results as $key => $value) {
-						$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
+						$sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
 					}
 
 					array_multisort($sort_order, SORT_ASC, $results);
 
 					foreach ($results as $result) {
-						if ($this->config->get($result['code'] . '_status')) {
-							$this->load->model('total/' . $result['code']);
-
-							$this->{'model_total_' . $result['code']}->getTotal($order_data['totals'], $total, $taxes);
+						if ($this->config->get('total_' . $result['code'] . '_status')) {
+							$this->load->model('extension/total/' . $result['code']);
+							
+							// We have to put the totals in an array so that they pass by reference.
+							$this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
 						}
 					}
 
 					$sort_order = array();
 
-					foreach ($order_data['totals'] as $key => $value) {
+					foreach ($total_data['totals'] as $key => $value) {
 						$sort_order[$key] = $value['sort_order'];
 					}
 
-					array_multisort($sort_order, SORT_ASC, $order_data['totals']);
+					array_multisort($sort_order, SORT_ASC, $total_data['totals']);
+
+					$order_data = array_merge($order_data, $total_data);
 
 					if (isset($this->request->post['comment'])) {
 						$order_data['comment'] = $this->request->post['comment'];
@@ -642,18 +656,16 @@ class ControllerApiOrder extends Controller {
 						$order_data['comment'] = '';
 					}
 
-					$order_data['total'] = $total;
-
 					if (isset($this->request->post['affiliate_id'])) {
 						$subtotal = $this->cart->getSubTotal();
 
 						// Affiliate
-						$this->load->model('affiliate/affiliate');
+						$this->load->model('account/customer');
 
-						$affiliate_info = $this->model_affiliate_affiliate->getAffiliate($this->request->post['affiliate_id']);
+						$affiliate_info = $this->model_account_customer->getAffiliate($this->request->post['affiliate_id']);
 
 						if ($affiliate_info) {
-							$order_data['affiliate_id'] = $affiliate_info['affiliate_id'];
+							$order_data['affiliate_id'] = $affiliate_info['customer_id'];
 							$order_data['commission'] = ($subtotal / 100) * $affiliate_info['commission'];
 						} else {
 							$order_data['affiliate_id'] = 0;
@@ -672,21 +684,12 @@ class ControllerApiOrder extends Controller {
 					} else {
 						$order_status_id = $this->config->get('config_order_status_id');
 					}
-
+					
 					$this->model_checkout_order->addOrderHistory($order_id, $order_status_id);
-
-					$json['success'] = $this->language->get('text_success');
 				}
 			} else {
 				$json['error'] = $this->language->get('error_not_found');
 			}
-		}
-
-		if (isset($this->request->server['HTTP_ORIGIN'])) {
-			$this->response->addHeader('Access-Control-Allow-Origin: ' . $this->request->server['HTTP_ORIGIN']);
-			$this->response->addHeader('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-			$this->response->addHeader('Access-Control-Max-Age: 1000');
-			$this->response->addHeader('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 		}
 
 		$this->response->addHeader('Content-Type: application/json');
@@ -719,12 +722,36 @@ class ControllerApiOrder extends Controller {
 				$json['error'] = $this->language->get('error_not_found');
 			}
 		}
+		
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
 
-		if (isset($this->request->server['HTTP_ORIGIN'])) {
-			$this->response->addHeader('Access-Control-Allow-Origin: ' . $this->request->server['HTTP_ORIGIN']);
-			$this->response->addHeader('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-			$this->response->addHeader('Access-Control-Max-Age: 1000');
-			$this->response->addHeader('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+	public function info() {
+		$this->load->language('api/order');
+
+		$json = array();
+
+		if (!isset($this->session->data['api_id'])) {
+			$json['error'] = $this->language->get('error_permission');
+		} else {
+			$this->load->model('checkout/order');
+
+			if (isset($this->request->get['order_id'])) {
+				$order_id = $this->request->get['order_id'];
+			} else {
+				$order_id = 0;
+			}
+
+			$order_info = $this->model_checkout_order->getOrder($order_id);
+
+			if ($order_info) {
+				$json['order'] = $order_info;
+
+				$json['success'] = $this->language->get('text_success');
+			} else {
+				$json['error'] = $this->language->get('error_not_found');
+			}
 		}
 
 		$this->response->addHeader('Content-Type: application/json');
@@ -743,7 +770,7 @@ class ControllerApiOrder extends Controller {
 			$keys = array(
 				'order_status_id',
 				'notify',
-				'append',
+				'override',
 				'comment'
 			);
 
@@ -770,13 +797,6 @@ class ControllerApiOrder extends Controller {
 			} else {
 				$json['error'] = $this->language->get('error_not_found');
 			}
-		}
-
-		if (isset($this->request->server['HTTP_ORIGIN'])) {
-			$this->response->addHeader('Access-Control-Allow-Origin: ' . $this->request->server['HTTP_ORIGIN']);
-			$this->response->addHeader('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-			$this->response->addHeader('Access-Control-Max-Age: 1000');
-			$this->response->addHeader('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 		}
 
 		$this->response->addHeader('Content-Type: application/json');

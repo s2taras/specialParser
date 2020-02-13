@@ -1,9 +1,13 @@
 <?php
+// *	@source		See SOURCE.txt for source and other copyright.
+// *	@license	GNU General Public License version 3; see LICENSE.txt
+
 class ControllerCheckoutFailure extends Controller {
 	public function index() {
 		$this->load->language('checkout/failure');
 
 		$this->document->setTitle($this->language->get('heading_title'));
+		$this->document->setRobots('noindex,follow');
 
 		$data['breadcrumbs'] = array();
 
@@ -19,7 +23,7 @@ class ControllerCheckoutFailure extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_checkout'),
-			'href' => $this->url->link('checkout/checkout', '', 'SSL')
+			'href' => $this->url->link('checkout/checkout', '', true)
 		);
 
 		$data['breadcrumbs'][] = array(
@@ -27,11 +31,7 @@ class ControllerCheckoutFailure extends Controller {
 			'href' => $this->url->link('checkout/failure')
 		);
 
-		$data['heading_title'] = $this->language->get('heading_title');
-
 		$data['text_message'] = sprintf($this->language->get('text_message'), $this->url->link('information/contact'));
-
-		$data['button_continue'] = $this->language->get('button_continue');
 
 		$data['continue'] = $this->url->link('common/home');
 
@@ -42,10 +42,6 @@ class ControllerCheckoutFailure extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/common/success.tpl')) {
-			$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/common/success.tpl', $data));
-		} else {
-			$this->response->setOutput($this->load->view('default/template/common/success.tpl', $data));
-		}
+		$this->response->setOutput($this->load->view('common/success', $data));
 	}
 }

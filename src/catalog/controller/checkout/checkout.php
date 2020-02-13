@@ -1,4 +1,7 @@
 <?php
+// *	@source		See SOURCE.txt for source and other copyright.
+// *	@license	GNU General Public License version 3; see LICENSE.txt
+
 class ControllerCheckoutCheckout extends Controller {
 	public function index() {
 		// Validate cart has products and has stock.
@@ -26,13 +29,15 @@ class ControllerCheckoutCheckout extends Controller {
 		$this->load->language('checkout/checkout');
 
 		$this->document->setTitle($this->language->get('heading_title'));
+		$this->document->setRobots('noindex,follow');
 
-		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment.js');
+		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment.min.js');
+		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment/moment-with-locales.min.js');
 		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js');
 		$this->document->addStyle('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css');
 
 		// Required by klarna
-		if ($this->config->get('klarna_account') || $this->config->get('klarna_invoice')) {
+		if ($this->config->get('payment_klarna_account') || $this->config->get('payment_klarna_invoice')) {
 			$this->document->addScript('http://cdn.klarna.com/public/kitt/toc/v1.0/js/klarna.terms.min.js');
 		}
 
@@ -50,18 +55,22 @@ class ControllerCheckoutCheckout extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('checkout/checkout', '', 'SSL')
+			'href' => $this->url->link('checkout/checkout', '', true)
 		);
 
-		$data['heading_title'] = $this->language->get('heading_title');
-
-		$data['text_checkout_option'] = $this->language->get('text_checkout_option');
-		$data['text_checkout_account'] = $this->language->get('text_checkout_account');
-		$data['text_checkout_payment_address'] = $this->language->get('text_checkout_payment_address');
-		$data['text_checkout_shipping_address'] = $this->language->get('text_checkout_shipping_address');
-		$data['text_checkout_shipping_method'] = $this->language->get('text_checkout_shipping_method');
-		$data['text_checkout_payment_method'] = $this->language->get('text_checkout_payment_method');
-		$data['text_checkout_confirm'] = $this->language->get('text_checkout_confirm');
+		$data['text_checkout_option'] = sprintf($this->language->get('text_checkout_option'), 1);
+		$data['text_checkout_account'] = sprintf($this->language->get('text_checkout_account'), 2);
+		$data['text_checkout_payment_address'] = sprintf($this->language->get('text_checkout_payment_address'), 2);
+		$data['text_checkout_shipping_address'] = sprintf($this->language->get('text_checkout_shipping_address'), 3);
+		$data['text_checkout_shipping_method'] = sprintf($this->language->get('text_checkout_shipping_method'), 4);
+		
+		if ($this->cart->hasShipping()) {
+			$data['text_checkout_payment_method'] = sprintf($this->language->get('text_checkout_payment_method'), 5);
+			$data['text_checkout_confirm'] = sprintf($this->language->get('text_checkout_confirm'), 6);
+		} else {
+			$data['text_checkout_payment_method'] = sprintf($this->language->get('text_checkout_payment_method'), 3);
+			$data['text_checkout_confirm'] = sprintf($this->language->get('text_checkout_confirm'), 4);	
+		}
 
 		if (isset($this->session->data['error'])) {
 			$data['error_warning'] = $this->session->data['error'];
@@ -87,11 +96,7 @@ class ControllerCheckoutCheckout extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/checkout/checkout.tpl')) {
-			$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/checkout/checkout.tpl', $data));
-		} else {
-			$this->response->setOutput($this->load->view('default/template/checkout/checkout.tpl', $data));
-		}
+		$this->response->setOutput($this->load->view('checkout/checkout', $data));
 	}
 
 	public function country() {

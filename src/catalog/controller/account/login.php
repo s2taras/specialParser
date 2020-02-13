@@ -1,4 +1,7 @@
 <?php
+// *	@source		See SOURCE.txt for source and other copyright.
+// *	@license	GNU General Public License version 3; see LICENSE.txt
+
 class ControllerAccountLogin extends Controller {
 	private $error = array();
 
@@ -37,23 +40,20 @@ class ControllerAccountLogin extends Controller {
 					$this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
 				}
 
-
-				$this->response->redirect($this->url->link('account/account', '', 'SSL'));
+				$this->response->redirect($this->url->link('account/account', '', true));
 			}
 		}
 
 		if ($this->customer->isLogged()) {
-			$this->response->redirect($this->url->link('account/account', '', 'SSL'));
+			$this->response->redirect($this->url->link('account/account', '', true));
 		}
 
 		$this->load->language('account/login');
 
 		$this->document->setTitle($this->language->get('heading_title'));
+		$this->document->setRobots('noindex,follow');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			// Trigger customer pre login event
-			$this->event->trigger('pre.customer.login');
-
 			// Unset guest
 			unset($this->session->data['guest']);
 
@@ -79,24 +79,11 @@ class ControllerAccountLogin extends Controller {
 				}
 			}
 
-			// Add to activity log
-			$this->load->model('account/activity');
-
-			$activity_data = array(
-				'customer_id' => $this->customer->getId(),
-				'name'        => $this->customer->getFirstName() . ' ' . $this->customer->getLastName()
-			);
-
-			$this->model_account_activity->addActivity('login', $activity_data);
-
-			// Trigger customer post login event
-			$this->event->trigger('post.customer.login');
-
 			// Added strpos check to pass McAfee PCI compliance test (http://forum.opencart.com/viewtopic.php?f=10&t=12043&p=151494#p151295)
-			if (isset($this->request->post['redirect']) && (strpos($this->request->post['redirect'], $this->config->get('config_url')) !== false || strpos($this->request->post['redirect'], $this->config->get('config_ssl')) !== false)) {
+			if (isset($this->request->post['redirect']) && $this->request->post['redirect'] != $this->url->link('account/logout', '', true) && (strpos($this->request->post['redirect'], $this->config->get('config_url')) !== false || strpos($this->request->post['redirect'], $this->config->get('config_ssl')) !== false)) {
 				$this->response->redirect(str_replace('&amp;', '&', $this->request->post['redirect']));
 			} else {
-				$this->response->redirect($this->url->link('account/account', '', 'SSL'));
+				$this->response->redirect($this->url->link('account/account', '', true));
 			}
 		}
 
@@ -109,38 +96,27 @@ class ControllerAccountLogin extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_account'),
-			'href' => $this->url->link('account/account', '', 'SSL')
+			'href' => $this->url->link('account/account', '', true)
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_login'),
-			'href' => $this->url->link('account/login', '', 'SSL')
+			'href' => $this->url->link('account/login', '', true)
 		);
 
-		$data['heading_title'] = $this->language->get('heading_title');
+		if (isset($this->session->data['error'])) {
+			$data['error_warning'] = $this->session->data['error'];
 
-		$data['text_new_customer'] = $this->language->get('text_new_customer');
-		$data['text_register'] = $this->language->get('text_register');
-		$data['text_register_account'] = $this->language->get('text_register_account');
-		$data['text_returning_customer'] = $this->language->get('text_returning_customer');
-		$data['text_i_am_returning_customer'] = $this->language->get('text_i_am_returning_customer');
-		$data['text_forgotten'] = $this->language->get('text_forgotten');
-
-		$data['entry_email'] = $this->language->get('entry_email');
-		$data['entry_password'] = $this->language->get('entry_password');
-
-		$data['button_continue'] = $this->language->get('button_continue');
-		$data['button_login'] = $this->language->get('button_login');
-
-		if (isset($this->error['warning'])) {
+			unset($this->session->data['error']);
+		} elseif (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
 		} else {
 			$data['error_warning'] = '';
 		}
 
-		$data['action'] = $this->url->link('account/login', '', 'SSL');
-		$data['register'] = $this->url->link('account/register', '', 'SSL');
-		$data['forgotten'] = $this->url->link('account/forgotten', '', 'SSL');
+		$data['action'] = $this->url->link('account/login', '', true);
+		$data['register'] = $this->url->link('account/register', '', true);
+		$data['forgotten'] = $this->url->link('account/forgotten', '', true);
 
 		// Added strpos check to pass McAfee PCI compliance test (http://forum.opencart.com/viewtopic.php?f=10&t=12043&p=151494#p151295)
 		if (isset($this->request->post['redirect']) && (strpos($this->request->post['redirect'], $this->config->get('config_url')) !== false || strpos($this->request->post['redirect'], $this->config->get('config_ssl')) !== false)) {
@@ -180,16 +156,10 @@ class ControllerAccountLogin extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
 
-		if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/account/login.tpl')) {
-			$this->response->setOutput($this->load->view($this->config->get('config_template') . '/template/account/login.tpl', $data));
-		} else {
-			$this->response->setOutput($this->load->view('default/template/account/login.tpl', $data));
-		}
+		$this->response->setOutput($this->load->view('account/login', $data));
 	}
 
 	protected function validate() {
-		$this->event->trigger('pre.customer.login');
-
 		// Check how many login attempts have been made.
 		$login_info = $this->model_account_customer->getLoginAttempts($this->request->post['email']);
 
@@ -200,7 +170,7 @@ class ControllerAccountLogin extends Controller {
 		// Check if customer has been approved.
 		$customer_info = $this->model_account_customer->getCustomerByEmail($this->request->post['email']);
 
-		if ($customer_info && !$customer_info['approved']) {
+		if ($customer_info && !$customer_info['status']) {
 			$this->error['warning'] = $this->language->get('error_approved');
 		}
 
