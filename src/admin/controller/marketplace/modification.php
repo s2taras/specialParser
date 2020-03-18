@@ -8,6 +8,8 @@ class ControllerMarketplaceModification extends Controller {
 	private $error = array();
 
 	public function index() {
+//	    $this->clear();
+
 		$this->load->language('marketplace/modification');
 
 		$this->document->setTitle($this->language->get('heading_title'));
