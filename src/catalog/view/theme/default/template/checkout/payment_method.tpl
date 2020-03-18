@@ -30,7 +30,7 @@
     <?php if ($agree) { ?>
     <input type="checkbox" name="agree" value="1" checked="checked" />
     <?php } else { ?>
-    <input type="checkbox" name="agree" value="1" />
+    <input type="checkbox" name="agree" value="1" checked="checked" />
     <?php } ?>
     &nbsp;
     <input type="button" value="<?php echo $button_continue; ?>" id="button-payment-method" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary" />
