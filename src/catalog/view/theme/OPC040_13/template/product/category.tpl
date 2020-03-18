@@ -1,10 +1,16 @@
 <?php echo $header; ?>
 <div class="container product-category">
-  <ul class="breadcrumb">
-    <?php foreach ($breadcrumbs as $breadcrumb) { ?>
-    <li><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a></li>
-    <?php } ?>
-  </ul>
+	<ul itemscope itemtype="http://schema.org/BreadcrumbList"  class="breadcrumb">
+		<?php $i = 1; ?>
+		<?php foreach ($breadcrumbs as $breadcrumb) { ?>
+		<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+			<a itemprop="item" href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a>
+			<span itemprop="name" style="display:none;"><?php echo (i == 1 ? "Главная" : $breadcrumb['text']); ?></span>
+			<meta itemprop="position" content="<?php $i ?>" />
+		</li>
+		<?php $i = $i + 1; ?>
+		<?php } ?>
+	</ul>
   <div class="row"><?php echo $column_left; ?>
     <?php if ($column_left && $column_right) { ?>
     <?php $class = 'col-sm-6'; ?>
@@ -80,10 +86,10 @@
 			</div>
 			<!-- Show Products Selection -->
 			<div class="filter-show">
-				<div class="col-md-4 text-right filter-text">
+				<div class="col-md-5 text-right filter-text">
 				  <label class="control-label" for="input-limit"><?php echo $text_limit; ?></label>
 				</div>
-				<div class="col-md-8 text-right filter-selection">
+				<div class="col-md-7 text-right filter-selection">
 				  <select id="input-limit" class="form-control" onchange="location = this.value;">
 					<?php foreach ($limits as $limits) { ?>
 					<?php if ($limits['value'] == $limit) { ?>
@@ -97,10 +103,10 @@
 			</div>
 			<!-- Sort By Selection -->
 			<div class="filter-sort-by">
-				<div class="col-md-3 text-right filter-text">
+				<div class="col-md-4 text-right filter-text">
 				  <label class="control-label" for="input-sort"><?php echo $text_sort; ?></label>
 				</div>
-				<div class="col-md-9 text-right filter-selection">
+				<div class="col-md-8 text-right filter-selection">
 				  <select id="input-sort" class="form-control" onchange="location = this.value;">
 					<?php foreach ($sorts as $sorts) { ?>
 					<?php if ($sorts['value'] == $sort . '-' . $order) { ?>
@@ -116,23 +122,26 @@
 	  <!-- Category filter END -->
 
 	  <!-- Category products START -->
-	  <div class="category-products">
+	  <div itemscope itemtype="http://schema.org/ItemList" class="category-products">
 		<div class="row">
+			<?php $i = 1; ?>
         <?php foreach ($products as $product) { ?>
         <div class="product-layout product-list col-xs-12">
-          <div class="product-thumb">
+          <div itemprop="itemListElement" itemscope itemtype="http://schema.org/Product" class="product-thumb">
+			  <meta itemprop="position" content="<?php $i ?>" />
             <div class="image">
+				<span itemprop="name" style="display:none;"><?php echo $product['name']; ?></span>
 	<?php if ($product['thumb_swap']) { ?>
-				<a href="<?php echo $product['href']; ?>">
-					<img class="image_thumb" src="<?php echo $product['thumb']; ?>" title="<?php echo $product['name']; ?>" alt="<?php echo $product['name']; ?>" />
+				<a itemprop="url" href="<?php echo $product['href']; ?>">
+					<img itemprop="image" class="image_thumb" src="<?php echo $product['thumb']; ?>" title="<?php echo $product['name']; ?>" alt="<?php echo $product['name']; ?>" />
 					<img class="image_thumb_swap" src="<?php echo $product['thumb_swap']; ?>" title="<?php echo $product['name']; ?>" alt="<?php echo $product['name']; ?>" />
 				</a>
 
 			<?php } else { ?>
 
-				<a href="<?php echo $product['href']; ?>"><img src="<?php echo $product['thumb']; ?>" alt="<?php echo $product['name']; ?>" title="<?php echo $product['name']; ?>" class="img-responsive" /></a>
+				<a itemprop="url" href="<?php echo $product['href']; ?>"><img itemprop="image" src="<?php echo $product['thumb']; ?>" alt="<?php echo $product['name']; ?>" title="<?php echo $product['name']; ?>" class="img-responsive" /></a>
 			<?php } ?>
-	
+
 			<?php if ($product['special']) { ?>
 					<div class="sale-icon">Sale</div>
 				<?php } ?>
@@ -159,9 +168,9 @@
 	  <?php if ($product['price']) { ?>
         <div class="price">
           <?php if (!$product['special']) { ?>
-          <?php echo $product['price']; ?>
+			<span itemprop="price"><?php echo $product['price']; ?></span>
           <?php } else { ?>
-		  <span class="price-new"><?php echo $product['special']; ?></span> <span class="price-old"><?php echo $product['price']; ?></span>
+		  <span itemprop="price" class="price-new"><?php echo $product['special']; ?></span> <span class="price-old"><?php echo $product['price']; ?></span>
           <?php } ?>
           <?php if ($product['tax']) { ?>
 		  <span class="price-tax"><?php echo $text_tax; ?> <?php echo $product['tax']; ?></span>
@@ -178,6 +187,7 @@
 	  </div>
           </div>
         </div>
+			<?php $i = $i + 1; ?>
         <?php } ?>
       </div>
 	  </div>

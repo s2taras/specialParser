@@ -50,39 +50,39 @@
 	  <div class="a-link-content">
       <ul class="list-unstyled">
         <li><a href="{{ order }}">{{ text_order }}</a></li>
-        <li><a href="{{ download }}">{{ text_download }}</a></li>
+{#        <li><a href="{{ download }}">{{ text_download }}</a></li>#}
         {% if reward %}
         <li><a href="{{ reward }}">{{ text_reward }}</a></li>
         {% endif %}
-        <li><a href="{{ return }}">{{ text_return }}</a></li>
+{#        <li><a href="{{ return }}">{{ text_return }}</a></li>#}
         <li><a href="{{ transaction }}">{{ text_transaction }}</a></li>
         <li><a href="{{ recurring }}">{{ text_recurring }}</a></li>
       </ul>
 	  </div><!-- a-link-content END -->
 	  </div>
 
-	  <div class="a-link-list">
-	  <div class="a-link-heading"><h2>{{ text_my_affiliate }}</h2></div>
-	  <div class="a-link-content">
-      <ul class="list-unstyled">
-        {% if not tracking %}
-        <li><a href="{{ affiliate }}">{{ text_affiliate_add }}</a></li>
-        {% else %}
-        <li><a href="{{ affiliate }}">{{ text_affiliate_edit }}</a></li>
-        <li><a href="{{ tracking }}">{{ text_tracking }}</a></li>
-        {% endif %}
-      </ul>
-	  </div><!-- a-link-content END -->
-	  </div>
+{#	  <div class="a-link-list">#}
+{#	  <div class="a-link-heading"><h2>{{ text_my_affiliate }}</h2></div>#}
+{#	  <div class="a-link-content">#}
+{#      <ul class="list-unstyled">#}
+{#        {% if not tracking %}#}
+{#        <li><a href="{{ affiliate }}">{{ text_affiliate_add }}</a></li>#}
+{#        {% else %}#}
+{#        <li><a href="{{ affiliate }}">{{ text_affiliate_edit }}</a></li>#}
+{#        <li><a href="{{ tracking }}">{{ text_tracking }}</a></li>#}
+{#        {% endif %}#}
+{#      </ul>#}
+{#	  </div><!-- a-link-content END -->#}
+{#	  </div>#}
 
-	  <div class="a-link-list">
-	  <div class="a-link-heading"><h2>{{ text_my_newsletter }}</h2></div>
-	  <div class="a-link-content">
-      <ul class="list-unstyled">
-        <li><a href="{{ newsletter }}">{{ text_newsletter }}</a></li>
-      </ul>
-	  </div><!-- a-link-content END -->
-	  </div>
+{#	  <div class="a-link-list">#}
+{#	  <div class="a-link-heading"><h2>{{ text_my_newsletter }}</h2></div>#}
+{#	  <div class="a-link-content">#}
+{#      <ul class="list-unstyled">#}
+{#        <li><a href="{{ newsletter }}">{{ text_newsletter }}</a></li>#}
+{#      </ul>#}
+{#	  </div><!-- a-link-content END -->#}
+{#	  </div>#}
 
       {{ content_bottom }}</div>
     {{ column_right }}</div>

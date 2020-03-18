@@ -1,8 +1,14 @@
 <?php echo $header; ?>
 <div class="container product-product">
-  <ul class="breadcrumb">
+  <ul itemscope itemtype="http://schema.org/BreadcrumbList"  class="breadcrumb">
+    <?php $i = 1; ?>
     <?php foreach ($breadcrumbs as $breadcrumb) { ?>
-    <li><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a></li>
+    <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+      <a itemprop="item" href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a>
+      <span itemprop="name" style="display:none;"><?php echo (i == 1 ? "Главная" : $breadcrumb['text']); ?></span>
+      <meta itemprop="position" content="<?php $i ?>" />
+    </li>
+    <?php $i = $i + 1; ?>
     <?php } ?>
   </ul>
   <div class="row"><?php echo $column_left; ?>
@@ -13,7 +19,7 @@
     <?php } else { ?>
     <?php $class = 'col-sm-12'; ?>
     <?php } ?>
-    <div id="content" class="<?php echo $class; ?>"><?php echo $content_top; ?>
+    <div itemscope itemtype="http://schema.org/Product" id="content" class="<?php echo $class; ?>"><?php echo $content_top; ?>
 	  <h1 class="page-title"><?php echo $heading_title; ?></h1>
       <!-- Product row START -->
 	  <div class="row">
@@ -31,7 +37,7 @@
 		  <!-- Product Image thumbnails START -->
 			<div class="thumbnails">
             <?php if ($thumb) { ?>
-            <div class="product-image"><a class="thumbnail" href="<?php echo $popup; ?>" title="<?php echo $heading_title; ?>"><img src="<?php echo $thumb; ?>" title="<?php echo $heading_title; ?>" alt="<?php echo $heading_title; ?>" /></a><?php if ($special) { ?> <span class="product-sale-icon">Sale</span> <?php } ?></div>
+            <div class="product-image"><a class="thumbnail" href="<?php echo $popup; ?>" title="<?php echo $heading_title; ?>"><img itemprop="image" src="<?php echo $thumb; ?>" title="<?php echo $heading_title; ?>" alt="<?php echo $heading_title; ?>" /></a><?php if ($special) { ?> <span class="product-sale-icon">Sale</span> <?php } ?></div>
             <?php } ?>
 		<div class="additional-images-container">
             <?php if ($images) { ?>
@@ -80,7 +86,7 @@ $(".additional-images-container .customNavigation").addClass('owl-navigation');
 		<?php $class = 'col-sm-5'; ?>
 		<?php } ?>
 		<div class="<?php echo $class; ?> product-details col-xs-12 col-md-6">
-          <h1 class="product-name"><?php echo $heading_title; ?></h1>
+          <h1 itemprop="name" class="product-name"><?php echo $heading_title; ?></h1>
           <table class="product-info">
             <?php if ($manufacturer) { ?>
             <tr><td><?php echo $text_manufacturer; ?></td><td class="product-info-value"><a href="<?php echo $manufacturers; ?>"><?php echo $manufacturer; ?></a></td></tr>
@@ -93,10 +99,12 @@ $(".additional-images-container .customNavigation").addClass('owl-navigation');
           </table>
 
           <?php if ($price) { ?>
-          <ul class="list-unstyled product-price">
+          <ul itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="list-unstyled product-price">
             <?php if (!$special) { ?>
             <li>
-              <h2><?php echo $price; ?></h2>
+              <h2 itemprop="price"><?php echo $price; ?></h2>
+              <span itemprop="lowPrice" style="display:none;"><?php echo $priceNumber; ?></span>
+              <span itemprop="priceCurrency" style="display:none;"><?php echo $priceCurrency; ?></span>
             </li>
             <?php } else { ?>
 			
@@ -106,7 +114,7 @@ $(".additional-images-container .customNavigation").addClass('owl-navigation');
             </li>
             <?php } ?>
             <?php if ($tax) { ?>
-            <li class="product-tax"><?php echo $text_tax; ?> <?php echo $tax; ?></li>
+            <li class="product-tax"  style="display:none;"><?php echo $text_tax; ?> <?php echo $tax; ?></li>
             <?php } ?>
             <?php if ($points) { ?>
             <li class="product-reward-points"><?php echo $text_points; ?> <?php echo $points; ?></li>
@@ -286,9 +294,10 @@ $(".additional-images-container .customNavigation").addClass('owl-navigation');
 		  <!-- Product Wishlist Compare END -->
 
           <?php if ($review_status) { ?>
-          <div class="rating">
+          <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" class="rating">
 		  	<!-- Product Rating START -->
 			  <div class="product-rating">
+                <span itemprop="ratingValue" style="display:none">5</span>
 				  <?php for ($i = 1; $i <= 5; $i++) { ?>
 				  <?php if ($rating < $i) { ?>
 				  <span class="fa fa-stack"><i class="fa fa-star-o fa-stack-1x"></i></span>
@@ -324,7 +333,7 @@ $(".additional-images-container .customNavigation").addClass('owl-navigation');
             <?php } ?>
           </ul>
 			<div class="tab-content">
-            <div class="tab-pane active" id="tab-description"><?php echo $description; ?></div>
+            <div class="tab-pane active" itemprop="description" id="tab-description"><?php echo $description; ?></div>
             <?php if ($attribute_groups) { ?>
             <div class="tab-pane" id="tab-specification">
               <table class="table table-bordered">

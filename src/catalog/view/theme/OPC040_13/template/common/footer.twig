@@ -7,31 +7,12 @@
 </div>
 {% endif %}
 
-	{% if footer_left %}
-	<div class="footer-column footer-left-cms col-sm-3">
-	{{ footer_left }}
-	</div>
-	{% endif %}
-	  
-      <!--{% if informations %}
-      <div class="col-sm-2 footer-column {{ 'footer-' ~ text_information|replace({' ': '-'})|lower }}">
-        <h5>{{ text_information }}</h5>
-        <ul class="list-unstyled">
-         {% for information in informations %}
-          <li><a href="{{ information.href }}">{{ information.title }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}-->
-      <!--<div class="col-sm-3 footer-column {{ 'footer-' ~ text_service|replace({' ': '-'})|lower }}">
-        <h5>{{ text_service }}</h5>
-        <ul class="list-unstyled">
-          <li><a href="{{ contact }}">{{ text_contact }}</a></li>
-          <li><a href="{{ return }}">{{ text_return }}</a></li>
-          <li><a href="{{ sitemap }}">{{ text_sitemap }}</a></li>
-        </ul>
-      </div>-->
-      <div class="col-sm-3 footer-column {{ 'footer-' ~ text_extra|replace({' ': '-'})|lower }}">
+{#	{% if footer_left %}#}
+{#	<div class="footer-column footer-left-cms col-sm-3">#}
+{#	{{ footer_left }}   #}
+{#	</div>#}
+{#	{% endif %}#}
+      <div class="col-sm-4 footer-column {{ 'footer-' ~ text_extra|replace({' ': '-'})|lower }}">
         <h5>{{ text_extra }}</h5>
         <ul class="list-unstyled">
           <li><a href="{{ manufacturer }}">{{ text_manufacturer }}</a></li>
@@ -41,7 +22,7 @@
 		  <li><a href="{{ sitemap }}">{{ text_sitemap }}</a></li>
         </ul>
       </div>
-      <div class="col-sm-3 footer-column {{ 'footer-' ~ text_account|replace({' ': '-'})|lower }}">
+      <div class="col-sm-4 footer-column {{ 'footer-' ~ text_account|replace({' ': '-'})|lower }}">
         <h5>{{ text_account }}</h5>
         <ul class="list-unstyled">
           <li><a href="{{ account }}">{{ text_account }}</a></li>
@@ -53,7 +34,7 @@
       </div>
 
 	{% if footer_right %}
-	  <div class="footer-column footer-right-cms col-sm-3">
+	  <div class="footer-column footer-right-cms col-sm-4">
 	 {{ footer_right }}
 	  </div>
 	{% endif %}
@@ -78,8 +59,6 @@
 {% for script in scripts %}
 <script src="{{ script }}" type="text/javascript"></script>
 {% endfor %}
-<!--
-OpenCart is open source software and you are free to remove the powered by OpenCart if you want, but its generally accepted practise to make a small donation.
-Please donate via PayPal to donate@opencart.com
-//-->
+
+
 </body></html>
