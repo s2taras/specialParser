@@ -26,7 +26,7 @@ $_['entry_postcode_required'] = 'Индекс обязателен';
 $_['entry_status']            = 'Статус';
 
 // Help
-$_['help_address_format']     = 'Имя = {firstname}<br />Фамилия = {lastname}<br />Компания = {company}<br />Адрес 1 = {address_1}<br />Адрес 2 = {address_2}<br />Город = {city}<br />Индекс = {postcode}<br />Регион = {zone}<br />Код региона = {zone_code}<br />Страна = {country}';
+$_['help_address_format']     = 'Имя = {firstname}<br />Фамилия = {lastname}<br />Компания = {company}<br />Адрес = {address_1}<br />Адрес 2 = {address_2}<br />Город = {city}<br />Индекс = {postcode}<br />Регион = {zone}<br />Код региона = {zone_code}<br />Страна = {country}';
 
 // Error
 $_['error_permission']        = 'У вас недостаточно прав для внесения изменений!';

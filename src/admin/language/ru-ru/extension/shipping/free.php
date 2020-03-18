@@ -3,7 +3,7 @@
 // *	@license	GNU General Public License version 3; see LICENSE.txt
 
 // Heading
-$_['heading_title']    = 'Бесплатная доставка';
+$_['heading_title']    = 'Доставка по городу Днепр';
 
 // Text
 $_['text_shipping']    = 'Доставка';

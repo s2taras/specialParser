@@ -3,7 +3,7 @@
 // *	@license	GNU General Public License version 3; see LICENSE.txt
 
 // Heading
-$_['heading_title']    = 'Фиксированная стоимость доставки';
+$_['heading_title']    = 'Доставка Новой Почтой';
 
 // Text
 $_['text_shipping']    = 'Доставка';
