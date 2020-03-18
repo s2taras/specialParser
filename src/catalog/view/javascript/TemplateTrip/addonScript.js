@@ -269,13 +269,13 @@ $(window).resize(function(){ optionFilter(); });
 function footerToggle() {
 	if($( window ).width() < 992) {
 		
-		$("footer .footer-column h5").addClass( "toggle" );
-		$("footer .footer-column ul").css( 'display', 'none' );
-		$("footer .footer-column.active ul").css( 'display', 'block' );
+		// $("footer .footer-column h5").addClass( "toggle" );
+		// $("footer .footer-column ul").css( 'display', 'none' );
+		// $("footer .footer-column.active ul").css( 'display', 'block' );
 		$("footer .footer-column h5.toggle").unbind("click");
-		$("footer .footer-column h5.toggle").click(function() {
-			$(this).parent().toggleClass('active').find('ul.list-unstyled').slideToggle( "fast" );
-		});
+		// $("footer .footer-column h5.toggle").click(function() {
+		// 	$(this).parent().toggleClass('active').find('ul.list-unstyled').slideToggle( "fast" );
+		// });
 		
 		$("#column-left .panel-heading,#column-right .panel-heading").addClass( "toggle" );
 		$("#column-left .list-group,#column-right .list-group").css( 'display', 'none' );
@@ -293,38 +293,38 @@ function footerToggle() {
 		$(this).parent().toggleClass('active').find('.products-carousel').slideToggle( "fast" );
 		});
 		
-		$("#ttcmstestimonial .title_block").addClass( "toggle" );
-		$("#ttcmstestimonial #tttestimonial-carousel").css( 'display', 'none' );
-		$("#ttcmstestimonial .tttestimonial-inner.active tttestimonial-carousel").css( 'display', 'block' );
+		// $("#ttcmstestimonial .title_block").addClass( "toggle" );
+		// $("#ttcmstestimonial #tttestimonial-carousel").css( 'display', 'none' );
+		// $("#ttcmstestimonial .tttestimonial-inner.active tttestimonial-carousel").css( 'display', 'block' );
 		$("#ttcmstestimonial .title_block.toggle").unbind("click");
-		$("#ttcmstestimonial .title_block.toggle").click(function() {
-		$(this).parent().toggleClass('active').find('#tttestimonial-carousel').slideToggle( "fast" );
-		});
+		// $("#ttcmstestimonial .title_block.toggle").click(function() {
+		// $(this).parent().toggleClass('active').find('#tttestimonial-carousel').slideToggle( "fast" );
+		// });
 		
-		$("#ttcmsleftservices .title_block").addClass( "toggle" );
-		$("#ttcmsleftservices .block_content").css( 'display', 'none' );
-		$("#ttcmsleftservices.active .block_content").css( 'display', 'block' );
+		// $("#ttcmsleftservices .title_block").addClass( "toggle" );
+		// $("#ttcmsleftservices .block_content").css( 'display', 'none' );
+		// $("#ttcmsleftservices.active .block_content").css( 'display', 'block' );
 		$("#ttcmsleftservices .title_block.toggle").unbind("click");
-		$("#ttcmsleftservices .title_block").click(function() {
-		$(this).parent().toggleClass('active').find('.block_content').slideToggle( "fast" );
-		});
+		// $("#ttcmsleftservices .title_block").click(function() {
+		// $(this).parent().toggleClass('active').find('.block_content').slideToggle( "fast" );
+		// });
 		
-		$("#ttcmsfooterservice .title_block").addClass( "toggle" );
-		$("#ttcmsfooterservice .ttcmsfooterservice").css( 'display', 'none' );
-		$("#ttcmsfooterservice.active .ttcmsfooterservice").css( 'display', 'block' );
+		// $("#ttcmsfooterservice .title_block").addClass( "toggle" );
+		// $("#ttcmsfooterservice .ttcmsfooterservice").css( 'display', 'none' );
+		// $("#ttcmsfooterservice.active .ttcmsfooterservice").css( 'display', 'block' );
 		$("#ttcmsfooterservice .title_block.toggle").unbind("click");
-		$("#ttcmsfooterservice .title_block").click(function() {
-		$(this).parent().toggleClass('active').find('.ttcmsfooterservice').slideToggle( "fast" );
-		});
+		// $("#ttcmsfooterservice .title_block").click(function() {
+		// $(this).parent().toggleClass('active').find('.ttcmsfooterservice').slideToggle( "fast" );
+		// });
 		
 		
-		$("#ttcmsfooter .ttabout-title").addClass( "toggle" );
-		$("#ttcmsfooter .ttabout-desc").css( 'display', 'none' );
-		$("#ttcmsfooter.active .ttabout-desc").css( 'display', 'block' );
+		// $("#ttcmsfooter .ttabout-title").addClass( "toggle" );
+		// $("#ttcmsfooter .ttabout-desc").css( 'display', 'none' );
+		// $("#ttcmsfooter.active .ttabout-desc").css( 'display', 'block' );
 		$("#ttcmsfooter .ttabout-title.toggle").unbind("click");
-		$("#ttcmsfooter .ttabout-title").click(function() {
-		$(this).parent().toggleClass('active').find('.ttabout-desc').slideToggle( "fast" );
-		});
+		// $("#ttcmsfooter .ttabout-title").click(function() {
+		// $(this).parent().toggleClass('active').find('.ttabout-desc').slideToggle( "fast" );
+		// });
 		
 		$(".payment-icon-inner > h4").addClass( "toggle" );
 		$(".payment-icon-inner .paymentcms").css( 'display', 'none' );
