@@ -293,6 +293,8 @@ class ControllerProductProduct extends Controller {
 
 			if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
 				$data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+				$data['priceNumber'] = number_format((float)$product_info['price'], 2, '.', '');
+				$data['priceCurrency'] = $this->session->data['currency'];
 			} else {
 				$data['price'] = false;
 			}
@@ -376,6 +378,7 @@ class ControllerProductProduct extends Controller {
 			}
 
 			$data['reviews'] = sprintf($this->language->get('text_reviews'), (int)$product_info['reviews']);
+			$data['reviews_count'] = (int)$product_info['reviews'] == 0 ? 1 : (int)$product_info['reviews'];
 			$data['rating'] = (int)$product_info['rating'];
 
 			// Captcha

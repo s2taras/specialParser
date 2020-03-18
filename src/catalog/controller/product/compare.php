@@ -152,25 +152,44 @@ class ControllerProductCompare extends Controller {
 			$product_id = 0;
 		}
 
+//        return json_encode($this->session->data['compare']);
+
 		$this->load->model('catalog/product');
 
 		$product_info = $this->model_catalog_product->getProduct($product_id);
 
-		if ($product_info) {
-			if (!in_array($this->request->post['product_id'], $this->session->data['compare'])) {
-				if (count($this->session->data['compare']) >= 4) {
-					array_shift($this->session->data['compare']);
-				}
+		if (count($this->session->data['compare']) >= 4) {
+            $json['more'] = true;
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($json));
+        } else {
+            if ($product_info) {
+                if (!in_array($this->request->post['product_id'], $this->session->data['compare'])) {
+                    if (count($this->session->data['compare']) >= 4) {
+                        array_shift($this->session->data['compare']);
+                    }
 
-				$this->session->data['compare'][] = $this->request->post['product_id'];
-			}
+                    $this->session->data['compare'][] = $this->request->post['product_id'];
+                }
 
-			$json['success'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $this->request->post['product_id']), $product_info['name'], $this->url->link('product/compare'));
+                $json['success'] = sprintf(
+                    $this->language->get('text_success'),
+                    $this->url->link(
+                        'product/product',
+                        'product_id=' . $this->request->post['product_id']
+                    ),
+                    $product_info['name'],
+                    $this->url->link('product/compare')
+                );
 
-			$json['total'] = sprintf($this->language->get('text_compare'), (isset($this->session->data['compare']) ? count($this->session->data['compare']) : 0));
-		}
+                $json['total'] = sprintf(
+                    $this->language->get('text_compare'),
+                    (isset($this->session->data['compare']) ? count($this->session->data['compare']) : 0)
+                );
+            }
 
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($json));
+        }
 	}
 }
