@@ -3,5 +3,5 @@
 // *	@license	GNU General Public License version 3; see LICENSE.txt
 
 // Text
-$_['text_title']       = 'Бесплатная доставка';
-$_['text_description'] = 'Бесплатная доставка';
+$_['text_title']       = 'Доставка по городу Днепр';
+$_['text_description'] = 'Доставка по городу Днепр';
