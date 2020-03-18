@@ -10,3 +10,6 @@ src/image/cache/catalog
 docker/nginx/certbot
 src/config.php
 src/admin/config.php
+src/catalog/controller/extension/feed/sitemap.xml
+src/parser/error_log_file.log
+src/parser/progress_log.log
