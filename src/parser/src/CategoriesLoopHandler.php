@@ -101,7 +101,7 @@ class CategoriesLoopHandler
                 $this->getPDOProduct()->createProductToCategory($categoryId, $createdProductId);
                 $this->getPDOProduct()->createProductToStore(0, $createdProductId);
                 $this->getPDOProduct()->createProductDescription(
-                    $productModel, $productDescription, 'without tag', $productModel, $productModel, $productModel, $createdProductId
+                    $productModel, $productDescription, '', $productModel, $productModel, $productModel, $productModel, $createdProductId
                 );
                 $this->getPDOProduct()->parseAndUpdateProductImage($bigImageUrl, 1, $createdProductId);
                 $this->getPDOProduct()->parseAndUpdateProductImage($smallImageUrl, 1, $createdProductId);

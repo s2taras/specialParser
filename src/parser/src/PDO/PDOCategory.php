@@ -64,17 +64,17 @@ class PDOCategory
         return (int)$stmtFindCategoryId->fetch()['category_id'];
     }
 
-    public function createCategoryDescription($categoryName, $categoryId=null, $language=2)
+    public function createCategoryDescription($categoryName, $categoryId=null, $language=1)
     {
         if ($categoryId === null) {
             $categoryId = $this->findLastCreatedCategoryId();
         }
 
-        $sqlCreateCategoryDesc = "INSERT INTO shop_category_description (category_id,language_id,`name`,description,meta_title,meta_description,meta_keyword)
-                                  VALUES (?,?,?,?,?,?,?)";
+        $sqlCreateCategoryDesc = "INSERT INTO shop_category_description (category_id,language_id,`name`,description,meta_title,meta_description,meta_keyword,meta_h1)
+                                  VALUES (?,?,?,?,?,?,?,?)";
         $stmtCreateCategoryDesc = $this->getPDO()->prepare($sqlCreateCategoryDesc);
         $stmtCreateCategoryDesc = $stmtCreateCategoryDesc
-            ->execute([$categoryId, $language, $categoryName, $categoryName, $categoryName, $categoryName, $categoryName]);
+            ->execute([$categoryId, $language, $categoryName, $categoryName, $categoryName, $categoryName, $categoryName, $categoryName]);
     }
 
     public function createCategoryToStore($categoryId=null, $storeId=0)

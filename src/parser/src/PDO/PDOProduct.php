@@ -75,16 +75,16 @@ class PDOProduct
         $stmt->execute([$productId, $storeId]);
     }
 
-    public function createProductDescription($productName, $productDescription, $tag, $metaTitle, $metaDescription, $metaKeyword, $productId=null, $language=2)
+    public function createProductDescription($productName, $productDescription, $tag, $metaTitle, $metaDescription, $metaKeyword, $metaH1, $productId=null, $language=1)
     {
         if ($productId === null) {
             $productId = $this->findLastCreatedProductId();
         }
 
-        $sql = "INSERT INTO shop_product_description (product_id,language_id,`name`,description,tag,meta_title,meta_description,meta_keyword)
-                VALUES (?,?,?,?,?,?,?,?)";
+        $sql = "INSERT INTO shop_product_description (product_id,language_id,`name`,description,tag,meta_title,meta_description,meta_keyword,meta_h1)
+                VALUES (?,?,?,?,?,?,?,?,?)";
         $stmt = $this->getPDO()->prepare($sql);
-        $stmt->execute([$productId, $language, $productName, $productDescription, $tag, $metaTitle, $metaDescription, $metaKeyword]);
+        $stmt->execute([$productId, $language, $productName, $productDescription, $tag, $metaTitle, $metaDescription, $metaKeyword, $metaH1]);
     }
 
     public function parseAndUpdateProductImage($imgUrl, $counter=1, $productId=null)
