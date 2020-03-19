@@ -7,7 +7,6 @@ src/image/
 src/system/
 src/system/storage/logs/error.log
 src/image/cache/catalog
-docker/nginx/certbot
 src/config.php
 src/admin/config.php
 src/catalog/controller/extension/feed/sitemap.xml
