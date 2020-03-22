@@ -9,6 +9,7 @@ services:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./docker/nginx/certbot/conf:/etc/letsencrypt
       - ./docker/nginx/certbot/www:/var/www/certbot
+      - ./src/catalog/controller/extension/feed/sitemap.xml:/var/www/sitemap.xml
     ports:
       - 80:80
       - 443:443
